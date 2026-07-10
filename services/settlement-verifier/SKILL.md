@@ -9,7 +9,8 @@ committed hash before it ever reaches this service.
 
 ## Base URL
 
-`<!-- set at deploy: replace with the hosted URL, e.g. https://settlement-verifier.example.com -->`
+http://localhost:7016
+<!-- LOCAL testing value. Swap to the hosted URL once deployed, then refresh the copy in OpenClaw. -->
 
 ## How the agent should use this
 

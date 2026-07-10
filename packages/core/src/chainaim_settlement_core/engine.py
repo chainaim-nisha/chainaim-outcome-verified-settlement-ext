@@ -269,19 +269,47 @@ class SettlementEngine:
         )
 
     def _render_display(self, remainder: int) -> str:
+        # Human-readable transcript. This shapes ONLY the printed `display` string; the
+        # machine-readable tokens are unchanged in PerUnit.reason and in every trace line,
+        # so downstream verification (the trace and the signed receipt) is untouched.
         open_in = self._open_in
         assert open_in is not None  # _snapshot only calls after _require_open
-        cr = open_in.committed_reference
+        plain_reason = {
+            "artifact-match": "genuine, matched what was promised",
+            "checksum-ok": "intact, checksum matched",
+            "ack": "delivered",
+            "artifact-mismatch": "did not match what was promised",
+            "checksum-mismatch": "corrupted, checksum did not match",
+            "checksum-null": "no checksum was provided",
+            "no-ack": "never arrived",
+            "no-expected-hash": "could not be verified (no committed hash)",
+            "no-task-id": "could not be verified (deal id missing from payload)",
+        }
+        plain_rule = {
+            Criterion.ARTIFACT_MATCH: "only if it exactly matches what was promised",
+            Criterion.CHECKSUM: "only if it arrives intact (checksum matches)",
+            Criterion.ACK_RECEIVED: "once it has been delivered",
+        }
+        done = self._closed
+        rule = plain_rule.get(
+            open_in.committed_reference.criterion, "if it passes verification"
+        )
         header = (
-            f"settlement {open_in.ref} "
-            f"(attestor={open_in.attestor}, criterion={cr.criterion}, rate={open_in.rate})"
+            f"Settlement {'complete' if done else 'in progress'}: deal {open_in.ref}"
         )
-        rows = [
-            f"  unit {pu.seq}: {pu.verdict.upper()} ({pu.reason})"
-            for pu in self._per_unit
-        ]
-        state = "CLOSED" if self._closed else "OPEN"
+        subhead = f"Rule: pay {open_in.rate} per delivered item, {rule}."
+        rows: list[str] = []
+        for pu in self._per_unit:
+            plain = plain_reason.get(pu.reason, pu.reason)
+            if pu.verdict is Verdict.PASS:
+                rows.append(f"  Item {pu.seq}: PAID - {plain}.")
+            else:
+                rows.append(
+                    f"  Item {pu.seq}: NOT PAID - {plain}; payment stopped here."
+                )
+        status = "FINISHED" if done else "IN PROGRESS"
         footer = (
-            f"  settled_total={self._settled} remainder_unspent={remainder} [{state}]"
+            f"Total paid: {self._settled} | "
+            f"Budget unspent: {remainder} | Status: {status}"
         )
-        return "\n".join([header, *rows, footer])
+        return "\n".join([header, subhead, *rows, footer])

@@ -1,0 +1,12 @@
+# Keep the image lean and correct: never ship local venvs, VCS history, caches, or build junk.
+# NOTE: SKILL.md, demo_data/, packages/, services/ are REQUIRED at runtime -- do NOT add them here.
+.venv
+**/.venv
+.git
+**/__pycache__
+**/*.egg-info
+.pytest_cache
+**/.pytest_cache
+dist
+build
+DESIGN/

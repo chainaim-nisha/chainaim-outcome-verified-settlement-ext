@@ -31,15 +31,15 @@ members = ["packages/*", "services/*"]
 
 [tool.uv.sources]
 # ---- The frozen PR #61 engine. Import-only; never edited. Mirrors Service A's fork wiring. ----
-# LOCAL (active): editable paths. Relative to this file: ../ climbs to FINAGENTS1, then into the fork.
-nest-core              = { path = "../chainaim-nisha/nandatown/packages/nest-core", editable = true }
-nest-sdk               = { path = "../chainaim-nisha/nandatown/packages/nest-sdk", editable = true }
-nest-plugins-reference = { path = "../chainaim-nisha/nandatown/packages/nest-plugins-reference", editable = true }
+# LOCAL (commented for deploy): editable paths. Relative to this file: ../ climbs to FINAGENTS1, then into the fork.
+# nest-core              = { path = "../chainaim-nisha/nandatown/packages/nest-core", editable = true }
+# nest-sdk               = { path = "../chainaim-nisha/nandatown/packages/nest-sdk", editable = true }
+# nest-plugins-reference = { path = "../chainaim-nisha/nandatown/packages/nest-plugins-reference", editable = true }
 
-# GITHUB (deploy): comment the three lines above, uncomment these three. Pinned to the FROZEN commit.
-# nest-core              = { git = "https://github.com/chainaim-nisha/nandatown", subdirectory = "packages/nest-core", rev = "20e18b80f5f44c35cbc1494a83151e375112773e" }
-# nest-sdk               = { git = "https://github.com/chainaim-nisha/nandatown", subdirectory = "packages/nest-sdk", rev = "20e18b80f5f44c35cbc1494a83151e375112773e" }
-# nest-plugins-reference = { git = "https://github.com/chainaim-nisha/nandatown", subdirectory = "packages/nest-plugins-reference", rev = "20e18b80f5f44c35cbc1494a83151e375112773e" }
+# GITHUB (ACTIVE for deploy): pinned to the FROZEN commit 20e18b80f5f44c35cbc1494a83151e375112773e.
+nest-core              = { git = "https://github.com/chainaim-nisha/nandatown", subdirectory = "packages/nest-core", rev = "20e18b80f5f44c35cbc1494a83151e375112773e" }
+nest-sdk               = { git = "https://github.com/chainaim-nisha/nandatown", subdirectory = "packages/nest-sdk", rev = "20e18b80f5f44c35cbc1494a83151e375112773e" }
+nest-plugins-reference = { git = "https://github.com/chainaim-nisha/nandatown", subdirectory = "packages/nest-plugins-reference", rev = "20e18b80f5f44c35cbc1494a83151e375112773e" }
 
 # ---- Workspace member cross-reference ----
 chainaim-settlement-core = { workspace = true }

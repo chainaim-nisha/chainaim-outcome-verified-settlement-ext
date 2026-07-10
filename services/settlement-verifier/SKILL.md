@@ -9,8 +9,8 @@ committed hash before it ever reaches this service.
 
 ## Base URL
 
-http://localhost:7016
-<!-- LOCAL testing value. Swap to the hosted URL once deployed, then refresh the copy in OpenClaw. -->
+https://chainaim-outcome-verified-settlement-ext-production.up.railway.app
+<!-- Hosted on Railway (Service C). LOCAL default was http://localhost:7016. Refresh the copy in OpenClaw whenever this URL changes. -->
 
 ## How the agent should use this
 

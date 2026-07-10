@@ -43,6 +43,7 @@ from typing import Literal
 
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import PlainTextResponse
+from fastapi.routing import APIRoute
 from pydantic import BaseModel
 
 from chainaim_settlement_core.attestor import TrustedKeys, clear_for_release
@@ -210,6 +211,33 @@ def create_app(config: VerifierConfig | None = None) -> FastAPI:
             sig = cfg.signer.sign(sess.engine.receipt(), out.trace)
             return out.model_copy(update={"verdict_signature": sig})
         return out
+
+    @app.get("/")
+    async def index() -> dict[str, object]:
+        """Service index -- a discovery entry point for humans and agents.
+
+        The endpoint map is built by introspecting the live route table, so it can
+        never drift from what is actually mounted. The authoritative capability
+        document is GET /skill.md; interactive API docs are at GET /docs.
+        """
+        endpoints = dict(
+            sorted(
+                (
+                    route.path,
+                    sorted(m for m in route.methods if m not in {"HEAD", "OPTIONS"}),
+                )
+                for route in app.routes
+                if isinstance(route, APIRoute) and route.path != "/"
+            )
+        )
+        return {
+            "service": "settlement-verifier",
+            "version": app.version,
+            "status": "ok",
+            "skill_md": "/skill.md",
+            "docs": "/docs",
+            "endpoints": endpoints,
+        }
 
     @app.get("/health")
     async def health() -> dict[str, str]:

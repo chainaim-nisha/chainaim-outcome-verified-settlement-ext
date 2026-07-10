@@ -1,0 +1,14 @@
+{
+  "ref": "9f768e817c03d8bd0ad0b85b3b8cdac6187bb578a865b87b01dfabb2c46ea899",
+  "rate": 100,
+  "max_total": 500,
+  "attestor": "hash-only",
+  "committed_reference": {
+    "criterion": "artifact_match",
+    "task_id": "9f768e817c03d8bd0ad0b85b3b8cdac6187bb578a865b87b01dfabb2c46ea899",
+    "expected": {
+      "0": "c9c85b919ec977be9a7fec4cd8f50e308a05f5e8959c31842d68e610209e58cd",
+      "1": "6a0431f0d5038221437668394f88de4fc9d5f44847b576be753ee206ae1c2929"
+    }
+  }
+}

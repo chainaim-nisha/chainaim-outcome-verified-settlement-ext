@@ -1,0 +1,28 @@
+# chainaim-settlement-core
+#
+# The reusable settlement engine (nisha). Imports the FROZEN PR #61 plugin + gates and adds
+# the L1/L2/L3 gate runner, per-tick release loop, trace, and Ed25519 verdict signing.
+# NO business vocabulary lives here.
+#
+# The fork wiring ([tool.uv.sources] for nest-core/nest-sdk/nest-plugins-reference) is declared
+# ONCE at the workspace root (../../pyproject.toml) and inherited here -- do not repeat it.
+
+[project]
+name = "chainaim-settlement-core"
+version = "0.1.0"
+description = "Generic outcome-verified settlement engine: frozen PR #61 plugin + gates, L1/L2/L3, per-tick release, trace, Ed25519 verdict signing."
+requires-python = ">=3.12"
+dependencies = [
+    "nest-core",
+    "nest-sdk",               # not imported by us, but a hard dependency of nest-plugins-reference
+    "nest-plugins-reference",
+    "cryptography>=42.0",     # Ed25519 verdict signing (also already in-tree via the fork)
+    "pydantic>=2.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/chainaim_settlement_core"]

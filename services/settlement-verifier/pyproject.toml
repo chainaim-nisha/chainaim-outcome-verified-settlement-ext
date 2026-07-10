@@ -1,0 +1,21 @@
+# chainaim-settlement-verifier
+#
+# The HTTP shell (FastAPI) that exposes the generic settlement engine. Imports
+# chainaim-settlement-core (workspace member); knows nothing about business.
+#
+# Fork wiring + the chainaim-settlement-core source are declared at the workspace root
+# (../../pyproject.toml) and inherited here.
+
+[project]
+name = "chainaim-settlement-verifier"
+version = "0.1.0"
+description = "HTTP settlement-verifier service (FastAPI): house trio + /demo/settlement + /settle/open|advance|close + /verify."
+requires-python = ">=3.12"
+dependencies = [
+    "chainaim-settlement-core",
+    "fastapi>=0.110",
+    "uvicorn[standard]>=0.29",
+]
+
+[tool.uv]
+package = false

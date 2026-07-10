@@ -1,0 +1,70 @@
+# chainaim-outcome-verified-settlement-ext  (nisha) -- WORKSPACE ROOT
+#
+# This is a uv WORKSPACE root. It exists to wire the frozen PR #61 engine
+# (chainaim-nisha/nandatown) into every member (packages/*, services/*) in ONE place,
+# so no member pyproject repeats the fork wiring.
+#
+# The PR #61 fork is IMPORT-ONLY. We never edit it. We pin it two ways:
+#   * LOCAL (active below)  -> editable paths to the on-disk fork next to this repo under
+#                              FINAGENTS1. Picks up local edits; works ONLY on this machine.
+#   * GITHUB (commented)    -> the public fork, pinned to the FROZEN commit SHA. Reproducible;
+#                              works on Railway / a judge's box. Requires the commit to be
+#                              pushed (it is: confirmed via `git ls-remote`).
+#
+# FROZEN PR #61 commit (remote tip of the review branch, confirmed by git ls-remote):
+#   20e18b80f5f44c35cbc1494a83151e375112773e
+#
+# To switch to GitHub for deploy: comment the three `path = ...` lines and uncomment the
+# three `git = ...` lines below, then `uv sync` again.
+
+[project]
+name = "chainaim-outcome-verified-settlement-ext"
+version = "0.1.0"
+description = "Workspace root for the generic outcome-verified settlement verifier (nisha)."
+requires-python = ">=3.12"
+
+[tool.uv]
+package = false
+
+[tool.uv.workspace]
+members = ["packages/*", "services/*"]
+
+[tool.uv.sources]
+# ---- The frozen PR #61 engine. Import-only; never edited. Mirrors Service A's fork wiring. ----
+# LOCAL (active): editable paths. Relative to this file: ../ climbs to FINAGENTS1, then into the fork.
+nest-core              = { path = "../chainaim-nisha/nandatown/packages/nest-core", editable = true }
+nest-sdk               = { path = "../chainaim-nisha/nandatown/packages/nest-sdk", editable = true }
+nest-plugins-reference = { path = "../chainaim-nisha/nandatown/packages/nest-plugins-reference", editable = true }
+
+# GITHUB (deploy): comment the three lines above, uncomment these three. Pinned to the FROZEN commit.
+# nest-core              = { git = "https://github.com/chainaim-nisha/nandatown", subdirectory = "packages/nest-core", rev = "20e18b80f5f44c35cbc1494a83151e375112773e" }
+# nest-sdk               = { git = "https://github.com/chainaim-nisha/nandatown", subdirectory = "packages/nest-sdk", rev = "20e18b80f5f44c35cbc1494a83151e375112773e" }
+# nest-plugins-reference = { git = "https://github.com/chainaim-nisha/nandatown", subdirectory = "packages/nest-plugins-reference", rev = "20e18b80f5f44c35cbc1494a83151e375112773e" }
+
+# ---- Workspace member cross-reference ----
+chainaim-settlement-core = { workspace = true }
+
+
+# ---- Dev tooling. PEP 735 group; uv installs the `dev` group by default, so
+# ---- `uv run pytest ...` works from THIS repo root (where Group B+ verify runs).
+# ---- ruff + pyright are added here in Group F, when those checks first run.
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+    "httpx>=0.27",       # FastAPI TestClient (Group E service tests); test-only, not a runtime dep
+    # httpx2 -- since starlette>=1.2 the TestClient PREFERS httpx2 (Pydantic's maintained httpx fork) and
+    #   emits a StarletteDeprecationWarning when only plain httpx is installed. Adding httpx2 makes the
+    #   TestClient use it and silences that warning at the root (the same fix FastAPI itself shipped).
+    #   Kept ALONGSIDE httpx on purpose: starlette/fastapi still TYPE_CHECK against httpx (httpx2 has no
+    #   type stubs yet), so keeping httpx installed preserves the pyright-clean (0-error) state.
+    "httpx2>=2.2",       # test-only; Pydantic fork, current line is 2.x (2.2.0, 2026-05-17)
+    "ruff>=0.6",         # Group F: lint + format check across the workspace (floor; uv resolves latest)
+    "pyright>=1.1.390",  # Group F: static type check across the workspace (floor; uv resolves latest)
+]
+
+# ---- pytest config lives at the workspace root (the dir Group B+ verify runs from).
+# ---- importlib mode: no sys.path games, and Group C can add test files with the same
+# ---- basename across packages/ and services/ without import collisions.
+[tool.pytest.ini_options]
+addopts = "--import-mode=importlib"
+testpaths = ["packages", "services"]
